@@ -1,0 +1,28 @@
+
+        .sidebar {
+            transition: width 0.3s ease;
+            width: 80px;
+        }
+        .sidebar.expanded {
+            width: 200px;
+        }
+        .content {
+            transition: margin-left 0.3s ease;
+            margin-left: 80px;
+        }
+        .content.shifted {
+            margin-left: 200px;
+        }
+        .menu-text {
+            display: none;
+            margin-left: 10px;
+        }
+        .sidebar.expanded .menu-text {
+            display: inline;
+        }
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            cursor: pointer;
+        }

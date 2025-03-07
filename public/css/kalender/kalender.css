@@ -1,0 +1,332 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: #f5f5f5;
+    min-height: 100vh;
+}
+
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 30px;
+    background-color: white;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.05);
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+}
+
+.navbar img {
+    width: 45px;
+    transition: transform 0.3s;
+}
+
+.navbar img:hover {
+    transform: scale(1.1);
+}
+
+.content {
+    margin-top: 80px;
+    padding: 30px;
+    position: relative;
+    display: flex;
+    gap: 30px;
+}
+
+.calendar-section {
+    flex: 0 0 60%;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+}
+
+.task-list-section {
+    flex: 0 0 35%;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    height: fit-content;
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+}
+
+.calendar-slider {
+    display: flex;
+    transition: transform 0.3s ease;
+}
+
+.calendar-container {
+    width: 100%;
+    min-width: 100%;
+    flex-shrink: 0;
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.calendar-header h2 {
+    color: #007bff;
+    font-size: 24px;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+}
+
+.calendar-day {
+    background: #f8f9fa;
+    padding: 10px;
+    border-radius: 5px;
+    min-height: 60px;
+    transition: transform 0.2s;
+    cursor: pointer;
+}
+
+.calendar-day:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.day-header {
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+    text-align: center;
+    font-size: 0.9em;
+}
+
+.other-month {
+    background: #e9ecef;
+    color: #6c757d;
+}
+
+.today {
+    background: #e3f2fd;
+    border: 2px solid #007bff;
+}
+
+.task-item {
+    font-size: 11px;
+    background: #e3f2fd;
+    padding: 3px 6px;
+    border-radius: 3px;
+    margin-top: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.task-list-header {
+    font-size: 20px;
+    color: #007bff;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #eee;
+}
+
+.task-list-item {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    position: relative;
+}
+
+.task-list-item h3 {
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.task-list-item p {
+    color: #666;
+    font-size: 14px;
+    margin: 5px 0;
+}
+
+.task-list-item .time {
+    color: #007bff;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.task-actions {
+    position: absolute;
+    right: 15px;
+    top: 15px;
+}
+
+.task-actions .dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.task-actions .dropdown-toggle {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: #666;
+}
+
+.task-actions .dropdown-menu {
+    display: none;
+    position: absolute;
+    right: 0;
+    background-color: white;
+    min-width: 120px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+    border-radius: 4px;
+}
+
+.task-actions .dropdown-menu button {
+    width: 100%;
+    padding: 8px 16px;
+    border: none;
+    background: none;
+    text-align: left;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+}
+
+.task-actions .dropdown-menu button:hover {
+    background-color: #f1f1f1;
+}
+
+.task-actions .show {
+    display: block;
+}
+
+.calendar-nav {
+    position: static;
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.nav-btn {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-size: 14px;
+}
+
+.nav-btn:hover {
+    background: #0056b3;
+}
+
+.task-modal, .edit-modal {
+    display: none;
+    position: fixed;
+    z-index: 1001;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+}
+
+.task-modal-content, .edit-modal-content {
+    background-color: white;
+    margin: 15% auto;
+    padding: 20px;
+    width: 400px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.task-form, .edit-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.task-form input, .task-form textarea,
+.edit-form input, .edit-form textarea {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.task-form button, .edit-form button {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.task-form button:hover, .edit-form button:hover {
+    background: #0056b3;
+}
+
+.close-modal {
+    float: right;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.delete-confirm-modal {
+    display: none;
+    position: fixed;
+    z-index: 1002;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+}
+
+.delete-confirm-content {
+    background-color: white;
+    margin: 15% auto;
+    padding: 20px;
+    width: 300px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.delete-confirm-buttons {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.confirm-delete-btn, .cancel-delete-btn {
+    padding: 8px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    color: white;
+}
+
+.confirm-delete-btn {
+    background: #dc3545;
+}
+
+.cancel-delete-btn {
+    background: #6c757d;
+}

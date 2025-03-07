@@ -1,0 +1,254 @@
+
+        /* Detail Task Modal Styles */
+        .detail-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .detail-modal-content {
+            background-color: #fff;
+            margin: 5% auto;
+            padding: 30px;
+            width: 70%;
+            max-width: 800px;
+            border-radius: 15px;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .detail-header h2 {
+            color: #2c3e50;
+            font-size: 24px;
+            margin: 0;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .detail-field {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .detail-field label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #34495e;
+        }
+
+        .detail-field p {
+            margin: 0;
+            color: #2c3e50;
+        }
+
+        .detail-description {
+            grid-column: 1 / -1;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .status-not_started { background: #ffeaa7; color: #d35400; }
+        .status-in_progress { background: #81ecec; color: #00b894; }
+        .status-completed { background: #a8e6cf; color: #27ae60; }
+
+        .detail-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .detail-actions button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .detail-actions button:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-close {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .btn-edit {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-delete {
+            background: #e74c3c;
+            color: white;
+        }
+
+        /* New Task Modal Styles */
+        .task-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .task-modal-content {
+            background-color: #fff;
+            margin: 5% auto;
+            padding: 40px;
+            width: 80%;
+            max-width: 600px;
+            border-radius: 20px;
+            position: relative;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .task-modal-content h2 {
+            color: #2c3e50;
+            font-size: 28px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .task-form {
+            display: grid;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-size: 16px;
+            color: #34495e;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .task-form input[type="text"],
+        .task-form textarea,
+        .task-form select,
+        .task-form input[type="time"] {
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .task-form input[type="text"]:focus,
+        .task-form textarea:focus,
+        .task-form select:focus,
+        .task-form input[type="time"]:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+
+        .task-form textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .task-form select {
+            cursor: pointer;
+            background-color: white;
+        }
+
+        .task-form button[type="submit"] {
+            background-color: #3498db;
+            color: white;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .task-form button[type="submit"]:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .close-modal {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            font-size: 24px;
+            color: #95a5a6;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .close-modal:hover {
+            color: #34495e;
+            transform: rotate(90deg);
+        }
+
+        /* Form validation styles */
+        .task-form input:invalid,
+        .task-form textarea:invalid,
+        .task-form select:invalid {
+            border-color: #e74c3c;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .task-modal-content {
+                width: 90%;
+                padding: 20px;
+                margin: 10% auto;
+            }
+
+            .task-form input[type="text"],
+            .task-form textarea,
+            .task-form select,
+            .task-form input[type="time"] {
+                padding: 10px;
+            }
+        }
+ 
