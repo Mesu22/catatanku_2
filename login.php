@@ -130,7 +130,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
 
         .register {
-            margin-top: 1.5rem;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #e0e0e0;
             font-size: 0.95rem;
             color: #666;
         }
@@ -162,7 +164,65 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             object-fit: contain;
             vertical-align: middle;
         }
+
+        .google-signin-container {
+            margin-top: 20px;
+            padding: 10px 0;
+            border-top: 1px solid #e0e0e0;
+            position: relative;
+        }
+
+        .google-signin-container::before {
+            content: 'atau';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 0 10px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .g_id_signin {
+            display: flex !important;
+            justify-content: center;
+            margin-top: 10px;
+        }
     </style>
+    <meta name="google-signin-client_id" content="155224684798-v31obq4k8i3g171ure9c9ql9o145td37.apps.googleusercontent.com">
+    <script src="https://accounts.google.com/gsi/client" async></script>
+    <script>
+    function handleCredentialResponse(response) {
+        console.log("Received response:", response); // Debug log
+        
+        fetch('google_auth.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                credential: response.credential
+            })
+        })
+        .then(response => {
+            console.log("Server response status:", response.status); // Debug log
+            return response.json();
+        })
+        .then(data => {
+            console.log("Parsed data:", data); // Debug log
+            if (data.success) {
+                window.location.href = 'beranda.php';
+            } else {
+                alert('Login gagal: ' + (data.message || 'Terjadi kesalahan'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Terjadi kesalahan saat login');
+        });
+    }
+    </script>
 </head>
 <body>
     <div class="login-wrapper">
@@ -177,13 +237,28 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <input type="password" name="password" placeholder="Password" required>
                 <button class="btn" type="submit">Login</button>
             </form>
+            <div class="google-signin-container">
+                <div id="g_id_onload"
+                     data-client_id="155224684798-v31obq4k8i3g171ure9c9ql9o145td37.apps.googleusercontent.com"
+                     data-context="signin"
+                     data-ux_mode="popup"
+                     data-callback="handleCredentialResponse"
+                     data-auto_select="false"
+                     data-itp_support="true">
+                </div>
+                <div class="g_id_signin"
+                     data-type="standard"
+                     data-size="large"
+                     data-theme="outline"
+                     data-text="sign_in_with"
+                     data-shape="rectangular"
+                     data-logo_alignment="left">
+                </div>
+            </div>
             <div class="register">
                 Belum Punya Akun? <a href="register.php">Daftar Akun</a><br>
                 <a href="forgot-password.php">Lupa Password?</a>
             </div>
-            <button class="google-btn">
-                <img src="img/logo/logo google.png" alt="Google Logo"> Login dengan Google
-            </button>
         </div>
         <div class="image-container">
             <img src="img/desain/ach3 1.png" alt="Login Illustration">

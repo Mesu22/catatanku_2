@@ -7,6 +7,15 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
+if (!isset($_SESSION['theme_preference'])) {
+    // Get theme from database if available
+    require_once 'config/database.php';
+    $stmt = $pdo->prepare("SELECT theme_preference FROM users WHERE id = ?");
+    $stmt->execute([$_SESSION['user_id']]);
+    $theme = $stmt->fetchColumn();
+    $_SESSION['theme_preference'] = $theme ?: 'light';
+}
+
 // Mark task as completed
 if (isset($_POST['mark_completed'])) {
     $task_id = $_POST['task_id'];
@@ -38,56 +47,67 @@ if (isset($_POST['mark_completed'])) {
     <title>Dashboard - CatatanKu</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="public/css/beranda/beranda.css">
-    <link rel="stylesheet" href="public/css/sidebar/sidebar.css">
-    
+    <link rel="stylesheet" href="public/css/sidebar/sidebarbaru.css">
+    <link rel="stylesheet" href="public/css/beranda/search.css">
+    <link rel="stylesheet" href="public/css/beranda/berandabaru.css">
+    <link rel="stylesheet" href="public/css/navbar.css">
+    <link rel="stylesheet" href="public/css/beranda/berandabaru12.css">
 </head>
-<body>
+<body class="<?php echo isset($_SESSION['theme_preference']) ? $_SESSION['theme_preference'] : 'light'; ?>">
 
-    <!-- Navbar -->
-    <div class="navbar">
-        <img src="img/logo/logo mesa.png" alt="CatatanKu Logo">
-        <input type="text" class="search-bar" placeholder="Cari tugas anda...">
-    </div>
+    <?php include 'navbar.php'; ?>
 
     <?php include 'sidebar.php'; ?>
 
     <!-- Content -->
     <div class="content">
         <div class="container">
-            <!-- To-Do List -->
-            <div class="card">
-                <h3 class="welcome-message">👋 Welcome back, <?php echo $_SESSION['username']; ?></h3>
-                <h3>📌 To-Do</h3>
-                <button class="add-task-btn">
-                    <span>➕</span> Add New Task
-                </button>
-            </div>
+            <!-- Kolom kiri: To-Do dan Completed Tasks -->
+            <div>
+                <!-- To-Do List -->
+                <div class="card">
+                    <h3 class="welcome-message">👋 Welcome back, <?php echo $_SESSION['username']; ?></h3>
+                    <h3>📌 To-Do</h3>
+                    <button class="add-task-btn">
+                        <span>➕</span> Add New Task
+                    </button>
+                </div>
 
-            <!-- Task Status -->
-            <div class="card">
-                <h3>📊 Task Status</h3>
-                <div class="chart-container">
-                    <div class="chart-wrapper">
-                        <canvas id="completedChart"></canvas>
-                        <div class="chart-title">Completed</div>
-                        <div class="chart-count" id="completedCount">0 Tasks (0%)</div>
-                    </div>
-                    <div class="chart-wrapper">
-                        <canvas id="inProgressChart"></canvas>
-                        <div class="chart-title">In Progress</div>
-                        <div class="chart-count" id="inProgressCount">0 Tasks (0%)</div>
-                    </div>
-                    <div class="chart-wrapper">
-                        <canvas id="notStartedChart"></canvas>
-                        <div class="chart-title">Not Started</div>
-                        <div class="chart-count" id="notStartedCount">0 Tasks (0%)</div>
-                    </div>
+                <!-- Completed Tasks -->
+                <div class="card">
+                    <h3>✅ Completed Task</h3>
                 </div>
             </div>
 
-            <!-- Completed Tasks -->
-            <div class="card">
-                <h3>✅ Completed Task</h3>
+            <!-- Kolom kanan: Task Status dan Tugas Terlewat -->
+            <div>
+                <!-- Task Status -->
+                <div class="card">
+                    <h3>📊 Task Status</h3>
+                    <div class="chart-container">
+                        <div class="chart-wrapper">
+                            <canvas id="completedChart"></canvas>
+                            <div class="chart-title">Completed</div>
+                            <div class="chart-count" id="completedCount">0 Tasks (0%)</div>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="inProgressChart"></canvas>
+                            <div class="chart-title">In Progress</div>
+                            <div class="chart-count" id="inProgressCount">0 Tasks (0%)</div>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="notStartedChart"></canvas>
+                            <div class="chart-title">Not Started</div>
+                            <div class="chart-count" id="notStartedCount">0 Tasks (0%)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Overdue Tasks -->
+                <div class="card">
+                    <h3>⚠️ Tugas Terlewat</h3>
+                    <div id="overdueTasks" class="task-list"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -122,10 +142,14 @@ if (isset($_POST['mark_completed'])) {
                         <label for="due_date">Due Date</label>
                         <input type="date" id="due_date" name="due_date" required>
                     </div>
-
+                    
                     <div class="form-group half">
-                        <label for="due_time">Time</label>
-                        <input type="time" id="due_time" name="due_time" required value="00:00">
+                        <label for="priority">Priority</label>
+                        <select id="priority" name="priority" required>
+                            <option value="low">Low</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="high">High</option>
+                        </select>
                     </div>
                 </div>
                 
@@ -238,12 +262,46 @@ if (isset($_POST['mark_completed'])) {
 
         document.getElementById('taskForm').addEventListener('submit', (e) => {
             e.preventDefault();
-            document.getElementById('taskModal').style.display = 'none';
-            showNotification();
+            const formData = new FormData(e.target);
+            
+            // Validasi tanggal
+            const dueDate = new Date(formData.get('due_date'));
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            // Jika tanggal jatuh tempo adalah hari ini atau masa depan
+            // dan status bukan completed, set status sesuai pilihan user
+            if (dueDate >= today) {
+                // Biarkan status sesuai pilihan user
+                const selectedStatus = formData.get('status');
+                if (selectedStatus === 'overdue') {
+                    // Jika user memilih overdue tapi tanggal belum lewat, 
+                    // set ke not_started
+                    formData.set('status', 'not_started');
+                }
+            }
+            
+            fetch('tasks.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('taskModal').style.display = 'none';
+                    showNotification();
+                    loadTasks();
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => console.error('Error:', error));
         });
 
+        let tasks = []; // Tambahkan ini di luar semua fungsi
+
         function loadTasks() {
-            fetch('tasks.php', {
+            fetch('tasks_handler.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -253,16 +311,19 @@ if (isset($_POST['mark_completed'])) {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    updateTasksDisplay(data.data);
-                    updateCharts(data.data);
+                    console.log('Tasks loaded:', data.data);
+                    tasks = data.data;
+                    updateTasksDisplay(tasks);
+                    updateCharts(tasks);
                 }
             })
             .catch(error => console.error('Error:', error));
         }
 
-        function updateTasksDisplay(tasks) {
-            const todoContainer = document.querySelector('.card:first-of-type');
-            const completedContainer = document.querySelector('.card:nth-of-type(3)');
+        function updateTasksDisplay(tasksToDisplay) {
+            const todoContainer = document.querySelector('.container > div:first-child > .card:first-child');
+            const completedContainer = document.querySelector('.container > div:first-child > .card:last-child');
+            const overdueContainer = document.querySelector('#overdueTasks');
             
             let todoHTML = `
                 <h3 class="welcome-message">👋 Welcome back, <?php echo $_SESSION['username']; ?></h3>
@@ -272,51 +333,105 @@ if (isset($_POST['mark_completed'])) {
                 </button>
             `;
             
+            let overdueHTML = '';
             let completedHTML = `<h3>✅ Completed Task</h3>`;
             
-            tasks.forEach(task => {
-                const dueTime = task.due_time 
-                    ? task.due_time.substring(0, 5)  // Take only HH:mm part
-                    : '00:00';
-                
+            // Tambahkan pengecekan untuk hasil pencarian
+            if (tasksToDisplay.length === 0) {
+                const searchTerm = document.querySelector('.search-bar').value.trim();
+                if (searchTerm) {
+                    todoContainer.innerHTML = `
+                        <h3 class="welcome-message">👋 Welcome back, <?php echo $_SESSION['username']; ?></h3>
+                        <h3>📌 To-Do</h3>
+                        <button class="add-task-btn">
+                            <span>➕</span> Add New Task
+                        </button>
+                        <div class="no-results">
+                            <p>Tidak ada tugas yang cocok dengan pencarian: "${searchTerm}"</p>
+                        </div>
+                    `;
+                    completedContainer.innerHTML = `<h3>✅ Completed Task</h3>`;
+                    overdueContainer.innerHTML = '';
+                    return;
+                }
+            }
+            
+            tasksToDisplay.forEach(task => {
                 const completedAt = task.completed_at 
                     ? new Date(task.completed_at).toLocaleString('id-ID', {
-                        dateStyle: 'medium',
-                        timeStyle: 'short'
+                        dateStyle: 'medium'
                     }) 
                     : '';
                 
+                const priorityIcons = {
+                    'low': '🔵',
+                    'medium': '🟡',
+                    'high': '🔴'
+                };
+                
+                const priority = task.priority || 'medium';
+                
                 const taskHTML = `
-                    <div class="task" data-id="${task.id}">
-                        <strong>${task.title}</strong>
-                        <p>${task.description}</p>
-                        <div class="status">
-                            <span class="${task.status.replace('_', '-')}">${task.status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}</span>
-                            <small>📅 ${new Date(task.due_date).toLocaleDateString('id-ID')} ⏰ ${dueTime}</small>
-                            ${task.status === 'completed' ? `<small>✅ Completed: ${completedAt}</small>` : ''}
-                            ${task.status !== 'completed' ? `
-                            <form method="POST" style="display: inline;">
-                                <input type="hidden" name="task_id" value="${task.id}">
-                                <button type="submit" name="mark_completed" class="complete-btn">✓ Complete</button>
-                            </form>
-                            ` : ''}
+                    <div class="task task-${priority} ${task.status === 'overdue' ? 'overdue-task' : ''}" data-id="${task.id}">
+                        <div class="task-header">
+                            <strong>${task.title}</strong>
+                            <span class="priority-badge ${priority}">${priorityIcons[priority]} ${priority.charAt(0).toUpperCase() + priority.slice(1)}</span>
                         </div>
-                        <div class="menu-dots">⋮</div>
-                        <div class="dropdown-menu">
-                            <button onclick="editTask(${task.id}, '${task.title}', '${task.description}', '${task.due_date}', '${task.due_time || ''}', '${task.status}')">Edit</button>
-                            <button onclick="deleteTask(${task.id})">Delete</button>
+                        <p>${task.description}</p>
+                        <div class="task-meta">
+                            <span class="task-date">📅 ${new Date(task.due_date).toLocaleDateString('id-ID')}</span>
+                            <span class="status-${task.status}">${getStatusText(task.status)}</span>
+                            ${task.completed_at ? `<span class="completed-date">✅ Selesai: ${completedAt}</span>` : ''}
+                            ${task.overdue_at ? `<span class="overdue-date">⚠️ Terlewat: ${new Date(task.overdue_at).toLocaleDateString('id-ID')}</span>` : ''}
+                        </div>
+                        <div class="task-actions">
+                            <button class="action-toggle" onclick="toggleActionMenu(this)"></button>
+                            <div class="action-menu">
+                                ${task.status !== 'completed' ? `
+                                    <button class="action-item complete" onclick="completeTask(${task.id})">
+                                        <i class="fas fa-check"></i> Complete
+                                    </button>
+                                ` : ''}
+                                <button class="action-item edit" onclick="editTask(${task.id})">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <button class="action-item delete" onclick="deleteTask(${task.id})">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </div>
                         </div>
                     </div>
                 `;
                 
+                // Ubah logika pengecekan status tugas
+                const taskDate = new Date(task.due_date);
+                taskDate.setHours(0, 0, 0, 0);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+
                 if (task.status === 'completed') {
                     completedHTML += taskHTML;
                 } else {
-                    todoHTML += taskHTML;
+                    const taskDate = new Date(task.due_date);
+                    taskDate.setHours(0, 0, 0, 0);
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+
+                    if (taskDate < today) {
+                        // Jika tanggal sudah lewat, masukkan ke overdue
+                        overdueHTML += taskHTML;
+                    } else {
+                        // Jika tanggal belum lewat, masukkan ke todo
+                        todoHTML += taskHTML;
+                    }
                 }
             });
             
+            // Debug log untuk melihat konten overdue
+            console.log('Overdue HTML:', overdueHTML);
+            
             todoContainer.innerHTML = todoHTML;
+            overdueContainer.innerHTML = overdueHTML || '<p class="no-tasks-message">Tidak ada tugas yang terlewat</p>';
             completedContainer.innerHTML = completedHTML;
             
             // Add event listeners for menu dots
@@ -336,39 +451,39 @@ if (isset($_POST['mark_completed'])) {
                 document.getElementById('taskForm').reset();
                 document.querySelector('input[name="action"]').value = 'create';
             });
-        }
-
-        function editTask(id, title, description, dueDate, dueTime, status) {
-            document.getElementById('taskId').value = id;
-            document.getElementById('title').value = title;
-            document.getElementById('description').value = description;
-            document.getElementById('due_date').value = dueDate;
-            document.getElementById('due_time').value = dueTime ? dueTime.substring(0, 5) : '00:00';
-            document.getElementById('status').value = status;
-            document.querySelector('input[name="action"]').value = 'update';
-            document.getElementById('taskModal').style.display = 'block';
-        }
-
-        document.getElementById('taskForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const formData = new FormData(e.target);
             
-            fetch('tasks.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    document.getElementById('taskModal').style.display = 'none';
-                    showNotification();
-                    loadTasks();
-                } else {
-                    alert(data.message);
-                }
-            })
-            .catch(error => console.error('Error:', error));
-        });
+            // Terapkan filter pencarian jika ada nilai di search bar
+            const searchTerm = document.querySelector('.search-bar').value.toLowerCase().trim();
+            if (searchTerm) {
+                filterTasks(searchTerm);
+            }
+        }
+
+        function editTask(taskId) {
+            // Cari task dengan ID yang sesuai
+            const task = tasks.find(t => t.id === taskId);
+            
+            if (task) {
+                // Isi form dengan data task yang ditemukan
+                document.getElementById('taskId').value = task.id;
+                document.getElementById('title').value = task.title;
+                document.getElementById('description').value = task.description;
+                document.getElementById('due_date').value = formatDate(task.due_date);
+                document.getElementById('priority').value = task.priority;
+                document.getElementById('status').value = task.status;
+                
+                // Set action ke update dan tampilkan modal
+                document.querySelector('input[name="action"]').value = 'update';
+                document.getElementById('taskModal').style.display = 'block';
+            } else {
+                console.error('Task not found');
+            }
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toISOString().split('T')[0];
+        }
 
         let taskToDelete = null;
 
@@ -415,8 +530,395 @@ if (isset($_POST['mark_completed'])) {
             }
         });
 
+        // Tambahkan event listener untuk pencarian pada input search-bar
+        const searchBar = document.querySelector('.search-bar');
+        const clearButton = document.querySelector('.search-clear');
+
+        // Tampilkan tombol clear ketika user mengetik
+        searchBar.addEventListener('input', function() {
+            const searchTerm = this.value.trim();
+            
+            if (searchTerm.length > 0) {
+                clearButton.style.display = 'flex';
+            } else {
+                clearButton.style.display = 'none';
+            }
+        });
+
+        // Fungsi untuk menghapus isi pencarian
+        clearButton.addEventListener('click', function() {
+            searchBar.value = '';
+            clearButton.style.display = 'none';
+            filterTasks('');
+            searchBar.focus();
+        });
+
+        // Tambahkan animasi ketika search bar difokuskan
+        searchBar.addEventListener('focus', function() {
+            document.querySelector('.search-wrapper').classList.add('active');
+        });
+
+        searchBar.addEventListener('blur', function() {
+            if (this.value.trim() === '') {
+                document.querySelector('.search-wrapper').classList.remove('active');
+            }
+        });
+
+        // Pastikan fungsi filter task dipanggil ketika tombol enter ditekan
+        searchBar.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                filterTasks(this.value.toLowerCase().trim());
+            }
+        });
+
+        // Tambahkan fungsi initializeSearch
+        function initializeSearch() {
+            const searchBar = document.querySelector('.search-bar');
+            const clearButton = document.querySelector('.search-clear');
+            
+            if (!searchBar || !clearButton) {
+                console.error('Search elements not found');
+                return;
+            }
+
+            // Event listener untuk input pencarian
+            searchBar.addEventListener('input', function() {
+                const searchTerm = this.value.trim().toLowerCase();
+                clearButton.style.display = searchTerm.length > 0 ? 'block' : 'none';
+                filterTasks(searchTerm);
+            });
+
+            // Event listener untuk tombol clear
+            clearButton.addEventListener('click', function() {
+                searchBar.value = '';
+                this.style.display = 'none';
+                filterTasks('');
+                searchBar.focus();
+            });
+
+            // Event listener untuk tombol Enter
+            searchBar.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    filterTasks(this.value.toLowerCase().trim());
+                }
+            });
+        }
+
+        // Perbarui fungsi filterTasks
+        function filterTasks(searchTerm) {
+            if (!tasks || !Array.isArray(tasks)) {
+                return;
+            }
+            
+            searchTerm = searchTerm.toLowerCase().trim();
+            
+            // Jika searchTerm kosong, tampilkan semua tasks
+            if (!searchTerm) {
+                updateTasksDisplay(tasks);
+                return;
+            }
+
+            // Filter hanya berdasarkan title dan description
+            const filteredTasks = tasks.filter(task => {
+                const title = task.title ? task.title.toLowerCase() : '';
+                const description = task.description ? task.description.toLowerCase() : '';
+                
+                // Cek exact match terlebih dahulu untuk performa lebih baik
+                if (title === searchTerm || description === searchTerm) {
+                    return true;
+                }
+                
+                // Kemudian cek includes
+                return title.includes(searchTerm) || description.includes(searchTerm);
+            });
+
+            updateTasksDisplay(filteredTasks);
+        }
+
+        // Tambahkan fungsi helper untuk mendapatkan teks status
+        function getStatusText(status) {
+            switch(status) {
+                case 'overdue':
+                    return 'Tugas Terlewat';
+                case 'completed':
+                    return 'Selesai';
+                case 'in_progress':
+                    return 'Sedang Dikerjakan';
+                case 'not_started':
+                    return 'Belum Dimulai';
+                default:
+                    return 'Belum Dimulai';
+            }
+        }
+
+        // Tambahkan fungsi checkOverdueTasks
+        function checkOverdueTasks() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            tasks.forEach(task => {
+                // Skip jika task sudah completed
+                if (task.status === 'completed') return;
+                
+                // Skip jika tidak ada due_date
+                if (!task.due_date) return;
+                
+                const taskDate = new Date(task.due_date);
+                taskDate.setHours(0, 0, 0, 0);
+
+                // Jika tanggal sudah lewat dan status bukan completed,
+                // update ke overdue tanpa mempertimbangkan in_progress
+                if (taskDate < today && task.status !== 'completed') {
+                    const formData = new FormData();
+                    formData.append('action', 'update_status');
+                    formData.append('id', task.id);
+                    formData.append('status', 'overdue');
+                    formData.append('user_id', <?php echo $_SESSION['user_id']; ?>);
+
+                    fetch('tasks_handler.php', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            loadTasks();
+                        }
+                    })
+                    .catch(error => console.error('Error updating overdue status:', error));
+                }
+            });
+        }
+
+        // Tambahkan CSS untuk styling tugas terlewat
+        const style = document.createElement('style');
+        style.textContent = `
+            .overdue-task {
+                border-left: 4px solid #dc3545 !important;
+                background-color: rgba(220, 53, 69, 0.1);
+            }
+
+            .status-overdue {
+                background-color: #dc3545;
+                color: white;
+                padding: 4px 8px;
+                border-radius: 4px;
+                font-size: 0.85em;
+            }
+
+            .overdue-date {
+                color: #dc3545;
+                font-weight: 500;
+                font-size: 0.85em;
+            }
+
+            #overdueTasks {
+                margin-top: 15px;
+            }
+
+            #overdueTasks .no-tasks-message {
+                text-align: center;
+                color: #666;
+                padding: 20px;
+            }
+        `;
+        document.head.appendChild(style);
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTasks();
+            initializeSearch();
+        });
+
         loadTasks();
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize theme
+            const savedTheme = localStorage.getItem('theme') || document.body.className || 'light';
+            document.body.className = savedTheme;
+            document.querySelector('.navbar').className = `navbar ${savedTheme}`;
+            document.querySelector('.sidebar').className = `sidebar ${savedTheme}`;
+            
+            // Observe theme changes
+            const observer = new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => {
+                    if (mutation.attributeName === 'class') {
+                        const theme = document.body.className;
+                        document.querySelector('.navbar').className = `navbar ${theme}`;
+                        document.querySelector('.sidebar').className = `sidebar ${theme}`;
+                    }
+                });
+            });
+
+            observer.observe(document.body, {
+                attributes: true
+            });
+        });
+
+        function toggleActionMenu(button) {
+            // Tutup semua menu yang terbuka
+            document.querySelectorAll('.action-menu.show').forEach(menu => {
+                if (menu !== button.nextElementSibling) {
+                    menu.classList.remove('show');
+                }
+            });
+            
+            // Toggle menu yang diklik
+            const menu = button.nextElementSibling;
+            menu.classList.toggle('show');
+        }
+
+        // Tutup menu jika user mengklik di luar menu
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.task-actions')) {
+                document.querySelectorAll('.action-menu.show').forEach(menu => {
+                    menu.classList.remove('show');
+                });
+            }
+        });
+
+        // Tambahkan fungsi completeTask
+        function completeTask(taskId) {
+            const formData = new FormData();
+            formData.append('action', 'update_status');
+            formData.append('id', taskId);
+            formData.append('status', 'completed');
+            formData.append('user_id', <?php echo $_SESSION['user_id']; ?>);
+
+            fetch('tasks_handler.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification('Task marked as completed!');
+                    loadTasks();
+                } else {
+                    alert(data.message || 'Failed to complete task');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to complete task');
+            });
+        }
+
+        // Tambahkan CSS untuk tombol Complete
+        const additionalStyle = document.createElement('style');
+        additionalStyle.textContent = `
+            .action-item.complete {
+                background-color: #10B981;
+                color: white;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                padding: 8px 12px;
+                border: none;
+                border-radius: 6px;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                width: 100%;
+                text-align: left;
+                margin-bottom: 4px;
+            }
+
+            .action-item.complete:hover {
+                background-color: #059669;
+                transform: translateY(-1px);
+            }
+
+            .action-menu {
+                position: absolute;
+                right: 0;
+                top: 100%;
+                background: var(--component-bg);
+                border: 1px solid var(--border-color);
+                border-radius: 8px;
+                padding: 8px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                display: none;
+                z-index: 1000;
+                min-width: 150px;
+            }
+
+            .action-menu.show {
+                display: block;
+                animation: fadeIn 0.2s ease;
+            }
+
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(-5px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+        `;
+        document.head.appendChild(additionalStyle);
+
+        // Tambahkan CSS untuk styling hasil pencarian
+        const searchStyles = document.createElement('style');
+        searchStyles.textContent = `
+            .task {
+                opacity: 1;
+                transition: opacity 0.3s ease;
+            }
+
+            .search-highlight {
+                background-color: rgba(99, 102, 241, 0.2);
+                padding: 2px;
+                border-radius: 2px;
+            }
+
+            .search-no-results {
+                text-align: center;
+                padding: 20px;
+                color: var(--text-color);
+                background: var(--component-bg);
+                border-radius: 8px;
+                margin: 20px 0;
+            }
+        `;
+        document.head.appendChild(searchStyles);
+
+        // Inisialisasi pencarian saat dokumen dimuat
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchBar = document.querySelector('.search-bar');
+            const clearButton = document.querySelector('.search-clear');
+            
+            if (searchBar && clearButton) {
+                // Event untuk input pencarian
+                searchBar.addEventListener('input', function() {
+                    const searchTerm = this.value.trim();
+                    clearButton.style.display = searchTerm.length > 0 ? 'block' : 'none';
+                    filterTasks(searchTerm);
+                });
+
+                // Event untuk tombol clear
+                clearButton.addEventListener('click', function() {
+                    searchBar.value = '';
+                    this.style.display = 'none';
+                    loadTasks(); // Muat ulang semua tugas
+                    searchBar.focus();
+                });
+
+                // Event untuk tombol Enter
+                searchBar.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        filterTasks(this.value.trim());
+                    }
+                });
+            }
+        });
     </script>
+
+    <script src="public/js/theme.js"></script>
 
 </body>
 </html>

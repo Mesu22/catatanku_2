@@ -1,0 +1,883 @@
+/* Modern Theme Variables */
+:root {
+    /* Light Theme */
+    --bg-color: #f8f9fe;
+    --component-bg: #ffffff;
+    --text-color: #2d3748;
+    --border-color: #e2e8f0;
+    --button-bg: #edf2f7;
+    --button-text: #4a5568;
+    --button-hover: #e2e8f0;
+    --primary-color: #6366f1;
+    --primary-hover: #4f46e5;
+    --day-bg: #ffffff;
+    --day-hover: #f7fafc;
+    --header-bg: #ffffff;
+    --header-text: #1a202c;
+    --today-bg: #c7d2fe;
+    --item-bg: #ffffff;
+    --modal-bg: #ffffff;
+    --input-bg: #f8fafc;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    --gradient-1: linear-gradient(135deg, #6366f1 0%, #818cf8 100%);
+    --gradient-2: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+    
+    /* Tambahkan font variables */
+    --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    --font-heading: 'Plus Jakarta Sans', 'Inter', sans-serif;
+    --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+/* Dark Theme */
+body.dark {
+    --bg-color: #0f172a;
+    --component-bg: #1e293b;
+    --text-color: #e2e8f0;
+    --border-color: #334155;
+    --button-bg: #2d3748;
+    --button-text: #e2e8f0;
+    --button-hover: #4a5568;
+    --primary-color: #818cf8;
+    --primary-hover: #6366f1;
+    --day-bg: #1e293b;
+    --day-hover: #2d3748;
+    --header-bg: #1e293b;
+    --header-text: #f8fafc;
+    --today-bg: #312e81;
+    --item-bg: #1e293b;
+    --modal-bg: #1e293b;
+    --input-bg: #2d3748;
+}
+
+/* Wrapper */
+.wrapper {
+    display: flex;
+    min-height: 100vh;
+    padding-top: 60px;
+    background: var(--bg-color);
+}
+
+/* Content */
+.content {
+    margin-left: 90px;
+    margin-top: 60px;
+    padding: 20px;
+    transition: margin-left 0.3s ease;
+}
+
+.content.shifted {
+    margin-left: 200px;
+}
+
+/* Calendar Container */
+.calendar-container {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 12px;
+    width: 100%;
+    margin: 0;
+    padding: 12px;
+    background: var(--bg-color);
+    border-radius: 12px;
+    box-shadow: var(--shadow-lg);
+}
+
+/* Calendar Side */
+.calendar-left-side {
+    background: var(--component-bg);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border-color);
+    transition: transform 0.3s ease;
+}
+
+.calendar-left-side:hover {
+    transform: translateY(-2px);
+}
+
+/* Calendar Header */
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: var(--gradient-1);
+    border-radius: 12px;
+    color: white;
+}
+
+.calendar-title {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.calendar-title h2 {
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 8px 16px;
+    border-radius: 8px;
+}
+
+.current-month {
+    font-size: 24px;
+    font-weight: 700;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    letter-spacing: 0.5px;
+}
+
+/* Calendar Navigation */
+.calendar-nav {
+    display: flex;
+    gap: 10px;
+}
+
+.nav-btn {
+    padding: 8px 16px;
+    font-size: 0.95rem;
+    border: none;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.nav-btn i {
+    font-size: 0.8rem;
+}
+
+.nav-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-1px);
+}
+
+/* Calendar Grid */
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+    padding: 15px;
+}
+
+/* Calendar Day Styling */
+.calendar-day {
+    position: relative;
+    min-height: 90px;
+    padding: 4px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    width: 100%;
+}
+
+.day-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    overflow: hidden;
+    width: 100%;
+}
+
+.day-number {
+    font-size: 1rem;
+    font-weight: 500;
+    margin-bottom: 5px;
+}
+
+.day-tasks {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    overflow: hidden;
+    max-height: 60px;
+}
+
+.calendar-task {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 5px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    margin-bottom: 2px;
+}
+
+.calendar-task .task-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+}
+
+.calendar-task.high .task-dot {
+    background: #dc2626;
+}
+
+.calendar-task.medium .task-dot {
+    background: #d97706;
+}
+
+.calendar-task.low .task-dot {
+    background: #0284c7;
+}
+
+.calendar-task:hover {
+    background: var(--day-hover);
+}
+
+.calendar-day.has-tasks {
+    background: var(--day-bg);
+    border: 1px solid var(--primary-color);
+}
+
+.calendar-day:hover {
+    background: var(--day-hover);
+    cursor: pointer;
+}
+
+/* Task List Section */
+.task-list-section {
+    background: var(--component-bg);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border-color);
+    max-height: calc(100vh - 80px);
+    overflow-y: auto;
+}
+
+/* Task List Header */
+.task-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    background: var(--gradient-2);
+    border-radius: 12px;
+    color: white;
+    margin-bottom: 20px;
+}
+
+.task-list-header h3 {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* Filter Controls */
+.filter-controls {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    padding: 10px;
+    background: var(--input-bg);
+    border-radius: 12px;
+}
+
+.filter-button {
+    padding: 8px 16px;
+    font-size: 0.95rem;
+    border: none;
+    border-radius: 8px;
+    background: var(--button-bg);
+    color: var(--button-text);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.filter-button:hover,
+.filter-button.active {
+    background: var(--primary-color);
+    color: white;
+    transform: translateY(-1px);
+}
+
+/* Task Items */
+.task-list-item {
+    background: var(--component-bg);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 15px;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
+}
+
+.task-list-item:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.task-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.task-header h4 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: var(--text-color);
+}
+
+.task-description {
+    color: var(--text-color);
+    margin: 10px 0;
+    line-height: 1.5;
+}
+
+.task-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+    font-size: 0.9rem;
+}
+
+.task-date {
+    color: var(--text-color);
+    opacity: 0.8;
+}
+
+.completed-date {
+    color: #16a34a;
+}
+
+.task-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.edit-btn, .delete-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.2s ease;
+}
+
+.edit-btn {
+    background: #3b82f6;
+    color: white;
+}
+
+.delete-btn {
+    background: #ef4444;
+    color: white;
+}
+
+.edit-btn:hover, .delete-btn:hover {
+    transform: translateY(-1px);
+    opacity: 0.9;
+}
+
+/* Custom Scrollbar */
+.task-list-section::-webkit-scrollbar {
+    width: 8px;
+}
+
+.task-list-section::-webkit-scrollbar-track {
+    background: var(--bg-color);
+    border-radius: 4px;
+}
+
+.task-list-section::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 4px;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Priority Badges */
+.priority-badge {
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.priority-badge.high {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.priority-badge.medium {
+    background: #fef3c7;
+    color: #d97706;
+}
+
+.priority-badge.low {
+    background: #e0f2fe;
+    color: #0284c7;
+}
+
+/* Status Badges */
+.status-not-started,
+.status-in-progress,
+.status-completed {
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.status-not-started {
+    background: #f1f5f9;
+    color: #64748b;
+}
+
+.status-in-progress {
+    background: #e0f2fe;
+    color: #0284c7;
+}
+
+.status-completed {
+    background: #dcfce7;
+    color: #16a34a;
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: var(--component-bg);
+    margin: 15% auto;
+    padding: 20px;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 500px;
+    position: relative;
+}
+
+.close-popup {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.close-popup:hover {
+    color: var(--primary-color);
+}
+
+/* Form Styles */
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+/* Responsive Design */
+@media (max-width: 1400px) {
+    .calendar-container {
+        width: 98%;
+        gap: 15px;
+    }
+}
+
+@media (max-width: 1200px) {
+    .calendar-container {
+        grid-template-columns: 1fr;
+        max-width: 900px;
+    }
+}
+
+@media (max-width: 768px) {
+    .content {
+        margin-left: 0;
+        padding: 10px;
+    }
+    
+    .content.shifted {
+        margin-left: 0;
+    }
+    
+    .calendar-container {
+        width: 100%;
+        padding: 10px;
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Add Font Imports */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* Base Typography */
+body {
+    font-family: var(--font-primary);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Headings */
+h1, h2, h3, h4, h5, h6,
+.calendar-title h2,
+.current-month,
+.task-list-header h3 {
+    font-family: var(--font-heading);
+    letter-spacing: -0.02em;
+}
+
+/* Calendar Day Numbers */
+.day-number {
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+/* Task Items */
+.calendar-task {
+    font-family: var(--font-primary);
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.task-list-item h4 {
+    font-family: var(--font-heading);
+    font-size: 1.1rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+}
+
+/* Buttons */
+.nav-btn,
+.filter-button {
+    font-family: var(--font-primary);
+    font-weight: 500;
+    letter-spacing: 0.01em;
+}
+
+/* Status and Priority Badges */
+.priority-badge,
+.status-not-started,
+.status-in-progress,
+.status-completed {
+    font-family: var(--font-primary);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+}
+
+/* Task Meta Information */
+.task-meta {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+}
+
+/* Modal Edit Styles */
+.modal-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.btn-confirm, .btn-cancel {
+    padding: 8px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.btn-confirm {
+    background: var(--primary-color);
+    color: white;
+}
+
+.btn-cancel {
+    background: #ef4444;
+    color: white;
+}
+
+.btn-confirm:hover, .btn-cancel:hover {
+    transform: translateY(-2px);
+    opacity: 0.9;
+}
+
+/* New CSS for overdue status */
+.status-overdue {
+    background-color: #fee2e2;
+    color: #dc2626;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.status-overdue::before {
+    content: "⚠️";
+    margin-right: 4px;
+}
+
+.task-list-item.overdue {
+    border-left: 4px solid #dc2626;
+}
+
+.no-tasks-message {
+    text-align: center;
+    padding: 20px;
+    background: var(--component-bg);
+    border-radius: 8px;
+    margin: 20px 0;
+}
+
+.no-tasks-message p {
+    color: var(--text-color);
+    margin-bottom: 15px;
+}
+
+.overdue-task {
+    border-left: 4px solid #dc2626;
+    background-color: rgba(220, 38, 38, 0.05);
+}
+
+.overdue-date {
+    color: #dc2626;
+    font-size: 0.9em;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Edit Popup Styles */
+#editTaskPopup {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+}
+
+#editTaskPopup .modal-content {
+    position: relative;
+    background: var(--modal-bg);
+    width: 90%;
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.edit-popup input:focus,
+.edit-popup textarea:focus,
+.edit-popup select:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+}
+
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 25px;
+    border-radius: 8px;
+    color: white;
+    font-weight: 500;
+    z-index: 1000;
+    display: none;
+    animation: slideIn 0.3s ease;
+}
+
+.notification.show {
+    display: block;
+}
+
+.notification.success {
+    background: #10B981;
+}
+
+.notification.error {
+    background: #EF4444;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Tambahkan style untuk jarak antara Task Status dan Tugas Terlewat */
+.container > div:nth-child(2) .card {
+    margin-bottom: 20px; /* Ubah dari 15px menjadi 20px */
+    background: var(--card-bg);
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Tambahkan padding khusus untuk card Tugas Terlewat */
+.container > div:nth-child(2) .card:last-child {
+    padding-top: 25px; /* Tambah padding atas */
+    padding-bottom: 25px; /* Tambah padding bawah */
+}
+
+/* Sesuaikan margin untuk task list di dalam Tugas Terlewat */
+#overdueTasks {
+    margin-top: 20px; /* Ubah dari 15px menjadi 20px */
+}
+
+/* Sesuaikan jarak antar task dalam Tugas Terlewat */
+#overdueTasks .task {
+    margin-bottom: 15px; /* Tambah margin antar task */
+    padding: 20px; /* Tambah padding dalam task */
+    border-radius: 8px;
+    background: var(--component-bg);
+}
+
+/* Pastikan task terakhir tidak memiliki margin bottom */
+#overdueTasks .task:last-child {
+    margin-bottom: 0;
+}
+
+.edit-popup {
+    background: var(--component-bg);
+    padding: 25px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 600px;
+    position: relative;
+}
+
+.popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.close-popup {
+    font-size: 24px;
+    cursor: pointer;
+    color: var(--text-color);
+}
+
+.close-popup:hover {
+    color: var(--primary-color);
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.btn-save {
+    background: var(--primary-color);
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-save:hover {
+    transform: translateY(-2px);
+    opacity: 0.9;
+}
+
+.btn-cancel {
+    background: #ef4444;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-cancel:hover {
+    transform: translateY(-2px);
+    opacity: 0.9;
+}
+
+/* Tambahkan indikator jika ada tugas yang tersembunyi */
+.day-tasks::after {
+    content: "...";
+    display: none;
+    color: var(--text-color);
+    font-weight: bold;
+    padding: 0 5px;
+}
+
+.day-tasks.has-more::after {
+    display: block;
+}

@@ -1,0 +1,963 @@
+:root {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8fafc;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --border-color: #e2e8f0;
+    --accent-color: #3b82f6;
+    --card-bg: #ffffff;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --task-bg: #ffffff;
+    --chart-bg: #ffffff;
+    --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    --font-heading: 'Plus Jakarta Sans', 'Inter', sans-serif;
+    --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+/* Dark theme variables */
+body.dark {
+    --bg-primary: #1e293b;
+    --bg-secondary: #0f172a;
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --border-color: #334155;
+    --accent-color: #60a5fa;
+    --card-bg: #1e293b;
+    --shadow-color: rgba(0, 0, 0, 0.3);
+    --task-bg: #1e293b;
+    --chart-bg: #1e293b;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+body {
+    background-color: var(--bg-secondary);
+    min-height: 100vh;
+    color: var(--text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
+    font-family: var(--font-primary);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 30px;
+    background-color: white;
+    box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+    height: 60px;
+}
+.navbar img {
+    width: 45px;
+    height: auto;
+}
+.search-container {
+    position: relative;
+    width: 300px;
+    margin-right: 20px;
+}
+.search-bar {
+    width: 100%;
+    padding: 8px 35px 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    font-size: 14px;
+    outline: none;
+    transition: all 0.3s ease;
+}
+.search-bar:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.2);
+}
+.search-icon {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #666;
+    pointer-events: none;
+}
+.no-results {
+    animation: fadeIn 0.3s ease-out;
+    padding: 20px;
+    text-align: center;
+    color: #666;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    margin: 15px 0;
+    border: 1px dashed #dee2e6;
+}
+.no-results strong {
+    color: #007bff;
+    font-weight: 600;
+}
+.btn {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-left: 10px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    font-weight: 500;
+}
+.btn:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+.sidebar {
+    width: 80px;
+    height: 100vh;
+    background-color: white;
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding: 90px 15px 20px;
+    box-shadow: 4px 0px 10px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: width 0.3s ease;
+}
+.sidebar.expanded {
+    width: 200px;
+}
+.menu-text {
+    display: none;
+    margin-left: 10px;
+}
+.sidebar.expanded .menu-text {
+    display: inline;
+}
+.menu-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    cursor: pointer;
+}
+.profile-pic {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-bottom: 20px;
+    border: 2px solid #007bff;
+    background-color: #e0e0e0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.profile-pic img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.profile-pic .default-avatar {
+    font-size: 24px;
+    color: #666;
+}
+.content {
+    margin-top: 70px;
+    margin-left: 90px;
+    padding: 30px;
+    transition: margin-left 0.3s ease;
+}
+.content.shifted {
+    margin-left: 200px;
+}
+
+.container {
+    width: 90%;
+    margin: 20px auto;
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+    position: relative;
+}
+
+/* Tambahkan style untuk sticky container */
+.container > div:nth-child(2) {
+    position: sticky;
+    top: 80px; /* Sesuaikan dengan tinggi navbar */
+    height: fit-content;
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+}
+
+/* Style untuk card Task Status dan Tugas Terlewat */
+.container > div:nth-child(2) .card {
+    margin-bottom: 15px;
+    background: var(--card-bg);
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Scrollbar styling untuk container sticky */
+.container > div:nth-child(2)::-webkit-scrollbar {
+    width: 6px;
+}
+
+.container > div:nth-child(2)::-webkit-scrollbar-track {
+    background: var(--bg-secondary);
+    border-radius: 3px;
+}
+
+.container > div:nth-child(2)::-webkit-scrollbar-thumb {
+    background: var(--accent-color);
+    border-radius: 3px;
+}
+
+.card {
+    background: var(--card-bg);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border-color: var(--border-color);
+}
+
+h3 {
+    color: var(--text-primary);
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.welcome-message {
+    font-size: 24px;
+    color: var(--text-primary);
+    margin: 20px 0;
+    padding: 0 30px;
+}
+
+.task {
+    border: 1px solid #ddd;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    position: relative;
+    background: var(--task-bg);
+    border-color: var(--border-color);
+}
+
+.task img {
+    width: 50px;
+    border-radius: 5px;
+}
+
+.status {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+.status span {
+    padding: 3px 8px;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+.not-started { color: red; }
+.in-progress { color: blue; }
+.completed { color: green; }
+
+.chart-container {
+    display: flex;
+    justify-content: space-around;
+    padding: 10px;
+}
+
+.chart-wrapper {
+    width: 80px;
+    text-align: center;
+    background: var(--chart-bg);
+    border-color: var(--border-color);
+}
+
+.chart-title {
+    font-size: 12px;
+    margin-top: 5px;
+    color: var(--text-primary);
+}
+
+.chart-count {
+    color: var(--text-secondary);
+}
+
+.add-task-btn {
+    background-color: #007bff;
+    color: white;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin: 20px 0;
+    transition: transform 0.2s, box-shadow 0.2s;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.add-task-btn:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Add new logout button styles */
+.logout-btn {
+    margin-top: auto;
+    font-size: 24px;
+    cursor: pointer;
+    color: #dc3545;
+    transition: transform 0.2s;
+}
+
+.logout-btn:hover {
+    transform: scale(1.1);
+}
+
+/* Updated Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1001;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.6);
+    animation: fadeIn 0.3s;
+}
+
+@keyframes fadeIn {
+    from {opacity: 0;}
+    to {opacity: 1;}
+}
+
+.modal-content {
+    background: var(--card-bg);
+    margin: 3% auto;
+    padding: 40px;
+    max-width: 550px;
+    border-radius: 20px;
+    color: var(--text-primary);
+}
+
+.modal-content h2 {
+    color: #2c3e50;
+    font-size: 24px;
+    margin-bottom: 24px;
+    font-weight: 700;
+}
+
+.close {
+    right: 25px;
+    top: 25px;
+    font-size: 24px;
+    opacity: 0.5;
+}
+
+.close:hover {
+    opacity: 1;
+}
+
+/* Success Notification */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #28a745;
+    color: white;
+    padding: 15px 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    display: none;
+    z-index: 1002;
+    animation: slideInRight 0.5s;
+}
+
+@keyframes slideInRight {
+    from {transform: translateX(100%); opacity: 0;}
+    to {transform: translateX(0); opacity: 1;}
+}
+
+/* New styles for three dots menu */
+.menu-dots {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    cursor: pointer;
+    font-size: 20px;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 40px;
+    right: 15px;
+    background: var(--card-bg);
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    display: none;
+    z-index: 100;
+    border-color: var(--border-color);
+}
+
+.dropdown-menu button {
+    display: block;
+    width: 100%;
+    padding: 8px 15px;
+    border: none;
+    background: none;
+    text-align: left;
+    cursor: pointer;
+    color: var(--text-primary);
+}
+
+.dropdown-menu button:hover {
+    background: var(--bg-secondary);
+}
+
+.show {
+    display: block;
+}
+
+/* Add new style for complete button */
+.complete-btn {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+.complete-btn:hover {
+    background: #218838;
+}
+
+/* Delete confirmation modal */
+.delete-modal {
+    display: none;
+    position: fixed;
+    z-index: 1003;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.6);
+    animation: fadeIn 0.3s;
+}
+
+.delete-modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    width: 300px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.delete-modal-buttons {
+    margin-top: 20px;
+}
+
+.delete-modal-buttons button {
+    padding: 8px 20px;
+    margin: 0 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.btn-yes {
+    background-color: #dc3545;
+    color: white;
+}
+
+.btn-no {
+    background-color: #6c757d;
+    color: white;
+}
+
+/* Add new styles for task status card */
+.card:nth-child(2) {
+    position: sticky;
+    top: 100px;
+    height: fit-content;
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+}
+
+/* Modern Form Styles */
+.modern-form {
+    padding: 20px 0;
+}
+
+.form-group {
+    margin-bottom: 24px;
+    position: relative;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    font-size: 15px;
+    transition: all 0.3s ease;
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    border-color: #007bff;
+    background-color: var(--bg-primary);
+    box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.1);
+    outline: none;
+}
+
+.form-row {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 24px;
+}
+
+.form-group.half {
+    flex: 1;
+    margin-bottom: 0;
+}
+
+.form-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 32px;
+}
+
+.btn-save,
+.btn-cancel {
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-save {
+    background-color: #007bff;
+    color: white;
+    border: none;
+}
+
+.btn-save:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
+}
+
+.btn-cancel {
+    background-color: #f8f9fa;
+    color: #6c757d;
+    border: 2px solid #e9ecef;
+}
+
+.btn-cancel:hover {
+    background-color: #e9ecef;
+    transform: translateY(-2px);
+}
+
+/* Priority Badge Styles */
+.priority-badge {
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.8em;
+    margin-left: 8px;
+}
+
+.priority-badge.low {
+    background-color: #e3f2fd;
+    color: #1976d2;
+}
+
+.priority-badge.medium {
+    background-color: #fff3e0;
+    color: #f57c00;
+}
+
+.priority-badge.high {
+    background-color: #ffebee;
+    color: #d32f2f;
+}
+
+.task-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    padding-right: 40px;
+}
+
+.task p {
+    color: var(--text-secondary);
+}
+
+h1, h2, h3, h4, h5, h6,
+.welcome-message,
+.card h3 {
+    font-family: var(--font-heading);
+    letter-spacing: -0.02em;
+}
+
+.task-header strong {
+    font-family: var(--font-heading);
+    font-size: 1.1rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+}
+
+.task p {
+    font-family: var(--font-primary);
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.priority-badge,
+.status span,
+.complete-btn {
+    font-family: var(--font-primary);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+}
+
+.task .status small {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+}
+
+.chart-title,
+.chart-count {
+    font-family: var(--font-heading);
+    font-weight: 600;
+}
+
+.add-task-btn {
+    font-family: var(--font-primary);
+    font-weight: 500;
+    letter-spacing: 0.01em;
+}
+
+/* Modal Styles */
+.modal-content h2,
+.form-group label {
+    font-family: var(--font-heading);
+    letter-spacing: -0.01em;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    font-family: var(--font-primary);
+}
+
+.overdue-task {
+    border-left: 4px solid #dc3545 !important;
+    background-color: rgba(220, 53, 69, 0.1);
+}
+
+.status-overdue {
+    background-color: #dc3545;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.85em;
+    display: inline-block;
+    margin: 2px 0;
+}
+
+.overdue-date {
+    color: #dc3545;
+    font-weight: 500;
+    font-size: 0.85em;
+    display: inline-block;
+    margin: 2px 0;
+}
+
+#overdueTasks {
+    margin-top: 15px;
+}
+
+#overdueTasks .task {
+    margin-bottom: 10px;
+    padding: 15px;
+    border-radius: 8px;
+    background: var(--component-bg);
+}
+
+#overdueTasks .no-tasks-message {
+    text-align: center;
+    color: #666;
+    padding: 20px;
+}
+
+/* Tambahkan style untuk jarak pada Completed Task */
+.container > div:first-child > .card:last-child {
+    margin-top: 20px; /* Tambah jarak dari card To-Do */
+    padding: 25px; /* Tambah padding dalam card */
+}
+
+/* Sesuaikan jarak antar task dalam Completed Task */
+.container > div:first-child > .card:last-child .task {
+    margin-bottom: 15px; /* Tambah margin antar task */
+    padding: 20px; /* Tambah padding dalam task */
+    border-radius: 8px;
+    background: var(--component-bg);
+}
+
+/* Pastikan task terakhir tidak memiliki margin bottom */
+.container > div:first-child > .card:last-child .task:last-child {
+    margin-bottom: 0;
+}
+
+/* Tambah jarak untuk judul Completed Task */
+.container > div:first-child > .card:last-child h3 {
+    margin-bottom: 20px; /* Tambah jarak antara judul dan daftar task */
+}
+
+/* Task Action Buttons */
+.task-actions {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    display: flex;
+    gap: 8px;
+}
+
+.action-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    font-size: 20px;
+    color: var(--text-color);
+    position: relative;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.2s ease;
+}
+
+.action-toggle:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.action-toggle::after {
+    content: "⋮";
+    font-size: 24px;
+}
+
+.action-menu {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    background: var(--component-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    display: none;
+    z-index: 1000;
+    min-width: 150px;
+}
+
+.action-menu.show {
+    display: block;
+    animation: fadeIn 0.2s ease;
+}
+
+/* Animasi untuk menu dropdown */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.action-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    width: 100%;
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: var(--text-color);
+    font-size: 0.9rem;
+    text-align: left;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.action-item:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.action-item.complete {
+    color: #10B981;
+}
+
+.action-item.edit {
+    color: #3B82F6;
+}
+
+.action-item.delete {
+    color: #EF4444;
+}
+
+.action-item i {
+    font-size: 1rem;
+}
+
+/* Edit button styling */
+.edit-btn {
+    background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+    color: white;
+}
+
+.edit-btn:hover {
+    background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px -4px rgba(59, 130, 246, 0.3);
+}
+
+/* Delete button styling */
+.delete-btn {
+    background: linear-gradient(135deg, #ef4444 0%, #f87171 100%);
+    color: white;
+}
+
+.delete-btn:hover {
+    background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px -4px rgba(239, 68, 68, 0.3);
+}
+
+/* Hover effect for icons */
+.edit-btn:hover i {
+    transform: rotate(15deg);
+}
+
+.delete-btn:hover i {
+    transform: rotate(-15deg);
+}
+
+/* Active state */
+.edit-btn:active,
+.delete-btn:active {
+    transform: translateY(1px);
+    box-shadow: none;
+}
+
+/* Ripple effect */
+.edit-btn::after,
+.delete-btn::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    background-image: radial-gradient(circle, #fff 10%, transparent 10.01%);
+    background-repeat: no-repeat;
+    background-position: 50%;
+    transform: scale(10, 10);
+    opacity: 0;
+    transition: transform .5s, opacity 1s;
+}
+
+.edit-btn:active::after,
+.delete-btn:active::after {
+    transform: scale(0, 0);
+    opacity: .3;
+    transition: 0s;
+}
+
+/* Dark theme adjustments */
+body.dark .edit-btn {
+    background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+}
+
+body.dark .delete-btn {
+    background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+}
+
+body.dark .edit-btn:hover {
+    background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%);
+}
+
+body.dark .delete-btn:hover {
+    background: linear-gradient(135deg, #b91c1c 0%, #dc2626 100%);
+}
+
+/* Disabled state */
+.edit-btn:disabled,
+.delete-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Glass morphism effect */
+.edit-btn,
+.delete-btn {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+    .task-actions {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .edit-btn,
+    .delete-btn {
+        width: 100%;
+    }
+}

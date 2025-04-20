@@ -28,139 +28,161 @@ if (!$task) {
     <link rel="stylesheet" href="public/css/kalender/kalender.css">
     <style>
         .detail-container {
-            max-width: 900px;
-            margin: 120px auto 40px;
-            background: #ffffff;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            max-width: 1000px;
+            margin: 100px auto;
+            background: linear-gradient(145deg, #ffffff, #f5f7fa);
+            padding: 50px;
+            border-radius: 30px;
+            box-shadow: 20px 20px 60px #d9d9d9, -20px -20px 60px #ffffff;
         }
 
         .detail-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 35px;
-            padding-bottom: 20px;
-            border-bottom: 3px solid #f0f0f0;
+            margin-bottom: 40px;
+            padding-bottom: 25px;
+            border-bottom: 2px solid rgba(52, 152, 219, 0.2);
         }
 
         .detail-header h1 {
             color: #2c3e50;
-            font-size: 32px;
-            font-weight: 700;
-            position: relative;
-        }
-
-        .detail-header h1:after {
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            left: 0;
-            width: 60px;
-            height: 4px;
-            background: #3498db;
-            border-radius: 2px;
+            font-size: 36px;
+            font-weight: 800;
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
         }
 
         .detail-content {
-            margin: 30px 0;
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin: 40px 0;
         }
 
         .detail-field {
-            background: #f8f9fa;
-            padding: 25px;
-            border-radius: 15px;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(52, 152, 219, 0.1);
         }
 
         .detail-field:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(52, 152, 219, 0.2);
+            border-color: #3498db;
         }
 
         .detail-field label {
-            font-weight: 600;
-            color: #2c3e50;
+            font-weight: 700;
+            color: #34495e;
+            font-size: 20px;
+            margin-bottom: 15px;
             display: block;
-            margin-bottom: 10px;
-            font-size: 18px;
+            letter-spacing: 0.5px;
         }
 
         .detail-field p {
-            color: #34495e;
-            font-size: 16px;
-            line-height: 1.6;
+            color: #2c3e50;
+            font-size: 18px;
+            line-height: 1.8;
             margin: 0;
         }
 
         .detail-actions {
-            margin-top: 40px;
             display: flex;
-            gap: 15px;
-            justify-content: flex-end;
+            gap: 20px;
         }
 
         .btn {
-            padding: 12px 25px;
+            padding: 15px 30px;
             border: none;
-            border-radius: 10px;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: 700;
             cursor: pointer;
-            font-size: 16px;
-            font-weight: 600;
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .btn-edit {
-            background: #3498db;
+            background: linear-gradient(45deg, #3498db, #2980b9);
             color: white;
         }
 
         .btn-delete {
-            background: #e74c3c;
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
             color: white;
         }
 
         .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
         }
 
-        .btn-edit:before {
-            content: '✏️';
-        }
-
-        .btn-delete:before {
-            content: '🗑️';
+        .btn:active {
+            transform: translateY(1px);
         }
 
         .status-badge {
-            display: inline-block;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
 
-        .status-not-started {
-            background: #ffeaa7;
+        .status-not_started {
+            background: linear-gradient(45deg, #ffeaa7, #fdcb6e);
             color: #d35400;
         }
 
-        .status-in-progress {
-            background: #81ecec;
-            color: #00b894;
+        .status-in_progress {
+            background: linear-gradient(45deg, #81ecec, #00cec9);
+            color: #006266;
         }
 
         .status-completed {
-            background: #a8e6cf;
-            color: #27ae60;
+            background: linear-gradient(45deg, #a8e6cf, #55efc4);
+            color: #00b894;
+        }
+
+        .description-field {
+            grid-column: 1 / -1;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 35px;
+            border-radius: 25px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        }
+
+        @media (max-width: 768px) {
+            .detail-container {
+                margin: 20px;
+                padding: 30px;
+            }
+
+            .detail-header {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+
+            .btn {
+                padding: 12px 20px;
+                font-size: 16px;
+            }
         }
     </style>
 </head>
@@ -171,23 +193,21 @@ if (!$task) {
         <div class="detail-header">
             <h1>Detail Tugas</h1>
             <div class="detail-actions">
-                <button class="btn btn-edit" onclick="window.location.href='edit.php?id=<?php echo $task['id']; ?>'">Edit</button>
-                <button class="btn btn-delete" onclick="if(confirm('Apakah anda yakin ingin menghapus tugas ini?')) window.location.href='delete_task.php?id=<?php echo $task['id']; ?>'">Hapus</button>
+                <button class="btn btn-edit" onclick="window.location.href='edit.php?id=<?php echo $task['id']; ?>'">✏️ Edit</button>
+                <button class="btn btn-delete" onclick="if(confirm('Apakah anda yakin ingin menghapus tugas ini?')) window.location.href='delete_task.php?id=<?php echo $task['id']; ?>'">🗑️ Hapus</button>
             </div>
         </div>
 
         <div class="detail-content">
             <div class="detail-field">
-                <label>Judul</label>
+                <label>📝 Judul</label>
                 <p><?php echo htmlspecialchars($task['title']); ?></p>
             </div>
 
             <div class="detail-field">
-                <label>Status</label>
+                <label>🔄 Status</label>
                 <p>
-                    <span class="status-badge <?php 
-                        echo 'status-' . $task['status'];
-                    ?>">
+                    <span class="status-badge status-<?php echo $task['status']; ?>">
                     <?php 
                         switch($task['status']) {
                             case 'not_started':
@@ -208,17 +228,17 @@ if (!$task) {
             </div>
 
             <div class="detail-field">
-                <label>Tanggal</label>
-                <p>📅 <?php echo date('d F Y', strtotime($task['due_date'])); ?></p>
+                <label>📅 Tanggal</label>
+                <p><?php echo date('d F Y', strtotime($task['due_date'])); ?></p>
             </div>
 
             <div class="detail-field">
-                <label>Waktu</label>
-                <p>⏰ <?php echo date('H:i', strtotime($task['due_time'])); ?></p>
+                <label>⏰ Waktu</label>
+                <p><?php echo date('H:i', strtotime($task['due_time'])); ?></p>
             </div>
 
-            <div class="detail-field" style="grid-column: 1 / -1;">
-                <label>Deskripsi</label>
+            <div class="description-field">
+                <label>📋 Deskripsi</label>
                 <p><?php echo nl2br(htmlspecialchars($task['description'])); ?></p>
             </div>
         </div>

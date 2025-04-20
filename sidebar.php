@@ -1,26 +1,24 @@
 <!-- Sidebar -->
-<div class="sidebar">
-    <div id="toggleSidebar" style="cursor: pointer; font-size: 24px; text-align: center;">☰</div>
-    <div style="margin-top: 40px;">
+<div class="sidebar <?php echo isset($_SESSION['theme_preference']) ? $_SESSION['theme_preference'] : 'light'; ?>" id="mainSidebar">
+    <div id="toggleSidebar" class="toggle-btn">☰</div>
+    <div class="menu-container">
         <a href="beranda.php" class="menu-item">
-            <span style="font-size: 24px;">📝</span>
+            <span class="menu-icon">📝</span>
             <span class="menu-text">Tasks</span>
         </a>
         <a href="kalender.php" class="menu-item">
-            <span style="font-size: 24px;">📅</span>
+            <span class="menu-icon">📅</span>
             <span class="menu-text">Calendar</span>
         </a>
-        <div class="menu-item">
-            <span style="font-size: 24px;">⚙️</span>
+        <a href="settings.php" class="menu-item">
+            <span class="menu-icon">⚙️</span>
             <span class="menu-text">Settings</span>
-        </div>
-        <div class="menu-item">
-            <span style="font-size: 24px;">📊</span>
-            <span class="menu-text">Statistics</span>
-        </div>
+        </a>
     </div>
-    <a href="logout.php" class="logout-btn menu-item" title="Logout">
-        <span style="font-size: 24px;">🚪</span>
-        <span class="menu-text">Logout</span>
-    </a>
-</div> 
+    <div class="sidebar-footer">
+        <a href="logout.php" class="menu-item logout-btn">
+            <span class="menu-icon">🚪</span>
+            <span class="menu-text">Logout</span>
+        </a>
+    </div>
+</div>
